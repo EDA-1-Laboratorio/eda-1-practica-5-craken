@@ -1,8 +1,7 @@
 /* 
  * Objetivo: Completar las primitivas de la pila para evaluación de RPN.
  */
-
-#include "pilas.h"
+#include <pilas.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -12,12 +11,17 @@
 // SECCIÓN 1: PRIMITIVAS DE LA PILA (A IMPLEMENTAR)
 // =========================================================
 
+#define EMPTY 0
+#define FULL 10000
+
 // Funcion inicializar
 void inicializar(PILA *stk) {
     /* TODO: 
        1. Inicializar el contador de elementos (cnt) a 0.
        2. Inicializar el puntero al tope a NULL. 
     */
+	stk->cnt=0;
+	stk->tope=NULL;
 }
 
 // Funcion push
@@ -29,6 +33,11 @@ void push(PILA *stk, DATO x) {
        4. Actualizar el tope de la pila para que sea el nuevo elemento.
        5. Incrementar el contador (cnt).
     */
+	ELEMENTO *nuevo = (ELEMENTO*)malloc(sizeof(ELEMENTO));
+	nuevo->d=x;
+	nuevo->siguiente=stk->tope;
+	stk->tope=nuevo;
+	stk->cnt++;
 }
 
 // Funcion pop
@@ -46,18 +55,33 @@ DATO pop(PILA *stk) {
        6. Liberar la memoria (free) del nodo temporal.
        7. Retornar el dato.
     */
+	DATO temporal;
+	ELEMENTO *temporal1;
+	temporal1=stk->tope;
+	temporal=temporal1->d;
+	stk->tope =temporal1->siguiente;
+	stk->cnt--;
+	free(temporal1);
+	return temporal; 
 }
 
 // Funcion estavacia
 BOOLEAN estavacia(PILA *stk) {
     /* TODO: Retornar VERDADERO si el contador es 0, FALSO de lo contrario. */
-    return FALSE; 
+    if(stk->cnt==0){
+        return VERDADERO;
+    }else{
+        return FALSO;
+    }
 }
 
 // Funcion estallena
 BOOLEAN estallena(PILA *stk) {
     /* TODO: Retornar VERDADERO si el contador es igual a FULL. */
-    return FALSE;
+    	if(stk->cnt==FULL)
+	return VERDADERO;
+	else
+	return FALSO;
 }
 
 // =========================================================
