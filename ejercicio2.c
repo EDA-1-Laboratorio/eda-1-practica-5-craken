@@ -9,36 +9,49 @@
 
 // Definición de tipos básicos
 typedef char DATA;
-typedef struct elemento {
+
+typedef struct elemento{
     DATA d;
     struct elemento *siguiente;
 } ELEMENTO;
 
-typedef struct {
+typedef struct{
     int cnt;
     ELEMENTO *tope;
 } PILA;
 
+
 // --- Funciones de Pila (A completar por el alumno) ---
 void inicializar(PILA *s){
-	s->tope = (ELEMENTO *)malloc(0);
+    s->tope = NULL;
+    s->cnt = 0;
 }
+
 void push(PILA *s, DATA x){
-	s->tope->d = x;
-	s->tope->siguiente = s->tope+1;
-	s->tope++;
+    ELEMENTO *nuevo = (ELEMENTO*)malloc(sizeof(ELEMENTO));
+    nuevo->d = x;
+    nuevo->siguiente = s->tope;
+    s->tope = nuevo;
+    s->cnt++;
 }
+
 DATA pop(PILA *s){
-	s->tope--;
+    if(s->tope == NULL) return '\0';
 
-	return s->tope->siguiente->d;
+    ELEMENTO *temp = s->tope;
+    DATA valor = temp->d;
+
+    s->tope = temp->siguiente;
+    free(temp);
+    s->cnt--;
+
+    return valor;
 }
-
 
 int estavacia(PILA *s){
-	if (s->tope == s->tope-1) return 0;
-	return 1;
+    return s->tope == NULL;
 }
+
 
 /**
  * TAREA PRINCIPAL: Determinar si la cadena es palíndromo.
@@ -47,7 +60,7 @@ int estavacia(PILA *s){
  * 2. Pasar la mitad de la PILA A a una PILA B para comparar 
  * (o usar una estrategia de inversión total).
  */
-int esPalindromo(char cadena[]) {
+int esPalindromo(char cadena[]){
     PILA original, invertida;
     inicializar(&original);
     inicializar(&invertida);
@@ -66,36 +79,43 @@ int esPalindromo(char cadena[]) {
     // TIP: Al pasar elementos de una pila a otra, el orden se invierte.
     // Pero para comparar, necesitamos que una mantenga el orden original.
     // ¿Cómo usarías las dos pilas para tener la cadena al derecho y al revés?
-	
-	while (!estavacia(&original)) {
-		push(&invertida, original.tope->d);
-		original.tope--;
-	}
-	
-	while(original.tope->siguiente == original.tope+1)original.tope++;
     
-    /* TODO: Implementar lógica de comparación usando las dos pilas */
-	
-	printf(estavacia(&original));
-	while (!estavacia(&original)) {
-		printf("\n%c ; %c", pop(&original), pop(&invertida));
-//		if ( !(pop(&original) == pop(&invertida)) ) return 0;
-	}
+    PILA copia;
+    inicializar(&copia);
 
-    return 1; // Retornar 1 si es palíndromo, 0 si no.
+    while(!estavacia(&original)){
+        char x = pop(&original);
+        push(&invertida, x);
+        push(&copia, x);
+    }
+
+    while(!estavacia(&copia)){
+        push(&original, pop(&copia));
+    }
+
+	/* TODO: Implementar lógica de comparación usando las dos pilas */
+    while(!estavacia(&original)){
+        if(pop(&original) != pop(&invertida)){
+            return 0;
+        }
+    }
+
+    return 1;// Retornar 1 si es palíndromo, 0 si no.
 }
 
-int main() {
+
+int main(){
+
     char prueba1[] = "Anita lava la tina";
     char prueba2[] = "Estructuras de Datos";
 
     printf("--- TEST DE PALINDROMOS ---\n");
-    
-    printf("Prueba 1: '%s' -> %s\n", prueba1, 
-           esPalindromo(prueba1) ? "ES PALINDROMO" : "NO ES PALINDROMO");
-           
-    printf("Prueba 2: '%s' -> %s\n", prueba2, 
-           esPalindromo(prueba2) ? "ES PALINDROMO" : "NO ES PALINDROMO");
+
+    printf("Prueba 1: '%s' -> %s\n", prueba1,
+        esPalindromo(prueba1) ? "ES PALINDROMO" : "NO ES PALINDROMO");
+
+    printf("Prueba 2: '%s' -> %s\n", prueba2,
+        esPalindromo(prueba2) ? "ES PALINDROMO" : "NO ES PALINDROMO");
 
     return 0;
 }
